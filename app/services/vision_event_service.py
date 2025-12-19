@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 from app.models.vision_event import VisionEvent
+from app.services.rule_engine_service import evaluate_rules_for_vision_event
 
 
 def get_vision_event(db: Session, event_id: str) -> VisionEvent | None:
@@ -32,6 +33,10 @@ def create_vision_event(
     db.add(event)
     db.commit()
     db.refresh(event)
+
+    # Trigger rule engine for this vision event
+    evaluate_rules_for_vision_event(db, event)
+
     return event
 
 
