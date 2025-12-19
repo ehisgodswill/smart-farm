@@ -1,33 +1,36 @@
 from enum import Enum
 
-# Sensors
 class SensorTypeEnum(str, Enum):
     TEMPERATURE = "temperature"
     HUMIDITY = "humidity"
+    LIGHT = "light"
     WATER = "water"
     FEED = "feed"
 
-# Devices
 class DeviceTypeEnum(str, Enum):
     FAN = "fan"
-    HEATER = "heater"
     FEEDER = "feeder"
     LIGHT = "light"
+    ALARM = "alarm"
 
-# Rule operators
 class OperatorEnum(str, Enum):
-    GREATER = ">"
-    LESS = "<"
-    GREATER_EQUAL = ">="
-    LESS_EQUAL = "<="
-    EQUAL = "=="
+    GT = ">"
+    LT = "<"
+    GTE = ">="
+    LTE = "<="
+    EQ = "=="
+    NEQ = "!="
 
-# User roles
 class UserRoleEnum(str, Enum):
     ADMIN = "admin"
     OPERATOR = "operator"
 
-# Device action states
 class ActionValueEnum(str, Enum):
     ON = "ON"
     OFF = "OFF"
+
+class CommandStatusEnum(str, Enum):
+    pending = "pending"
+    sent = "sent"
+    failed = "failed"
+    acknowledged = "acknowledged"

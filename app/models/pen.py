@@ -1,13 +1,36 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from datetime import datetime, timezone
+from sqlalchemy import ForeignKey, Integer, String, DateTime
+from sqlalchemy.orm import Mapped, mapped_column
+
 from app.database import Base
-from datetime import datetime
 
 
 class Pen(Base):
     __tablename__ = "pens"
 
-    id = Column(String, primary_key=True)
-    farm_id = Column(String, ForeignKey("farms.id"))
-    name = Column(String)
-    capacity = Column(Integer)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Mapped[str] = mapped_column(
+        String,
+        primary_key=True
+    )
+
+    farm_id: Mapped[str] = mapped_column(
+        String,
+        ForeignKey("farms.id"),
+        nullable=False
+    )
+
+    name: Mapped[str] = mapped_column(
+        String,
+        nullable=False
+    )
+
+    capacity: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False
+    )

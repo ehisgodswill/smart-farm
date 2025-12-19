@@ -1,20 +1,23 @@
-import paho.mqtt.client as mqtt
 import json
+import paho.mqtt.client as mqtt
+from app.database import SessionLocal
+from app.services.sensor_ingestion_service import ingest_sensor_reading
 
-mqtt_client = mqtt.Client()
+MQTT_BROKER = "localhost"
+MQTT_TOPIC = "sensors/+/readings"
+
+def on_message(client, userdata, msg):
+    payload = json.loads(msg.payload.decode())
+
+    db = SessionLocal()
+    try:
+        ingest_sensor_reading(db, payload)
+    finally:
+        db.close()
 
 def start_mqtt():
-    mqtt_client.connect("localhost", 1883)
-    mqtt_client.loop_start()
-
-def send_device_command(device_id, pen_id, device, action):
-    payload = {
-        "device_id": device_id,
-        "pen_id": pen_id,
-        "device": device,
-        "action": action
-    }
-    mqtt_client.publish(
-        f"farm/device/{device_id}/command",
-        json.dumps(payload)
-    )
+    client = mqtt.Client()
+    client.on_message = on_message
+    client.connect(MQTT_BROKER)
+    client.subscribe(MQTT_TOPIC)
+    client.loop_start()
