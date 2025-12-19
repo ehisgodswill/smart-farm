@@ -5,7 +5,7 @@ from app.schemas.pen import PenCreate, PenUpdate, PenOut
 from app.services.pen_service import create_pen, get_pen, get_pens, update_pen, delete_pen
 from app.utils.db import get_db
 
-router = APIRouter(tags=["Pens"], prefix="/api/pens")
+router = APIRouter(tags=["Pens"])
 
 @router.post("", response_model=PenOut)
 def api_create_pen(payload: PenCreate, db: Session = Depends(get_db)):
