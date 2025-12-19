@@ -1,18 +1,18 @@
-from sqlalchemy import Column, String, Boolean, DateTime, Float
-from app.database import Base
+from sqlalchemy import Column, Boolean, DateTime, Enum as SQLEnum, Float, ForeignKey, String
 from datetime import datetime
-import uuid
+from app.database import Base
+from app.models.enums import SensorTypeEnum, DeviceTypeEnum, OperatorEnum, ActionValueEnum
 
 class Rule(Base):
     __tablename__ = "rules"
 
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    name = Column(String, nullable=False)
-    # null = global rule
-    pen_id = Column(String, nullable=True)
-    # Rule logic (engine-friendly)
-    condition = Column(String, nullable=False)  # e.g. "temperature > 30"
-    action = Column(String, nullable=False)     # e.g. "fan:ON"
-    enabled = Column(Boolean, default=True)
+    id = Column(String, primary_key=True)
+    pen_id = Column(String, ForeignKey("pens.id"), nullable=True)  # null = global
+    sensor_type = Column(SQLEnum(SensorTypeEnum), nullable=False)
+    operator = Column(SQLEnum(OperatorEnum), nullable=False)
+    threshold = Column(Float, nullable=False)
+    action_device = Column(SQLEnum(DeviceTypeEnum), nullable=False)
+    action_value = Column(SQLEnum(ActionValueEnum), nullable=False)
     priority = Column(Float, default=1.0)
+    enabled = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
