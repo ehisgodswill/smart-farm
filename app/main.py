@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import birds, sensors, devices, vision, alerts, rules
+from app.api import birds, sensors, devices, vision_events as vision, rules
 from app.mqtt.client import start_mqtt
 
 app = FastAPI(
@@ -26,13 +26,10 @@ app.add_middleware(
 # Routers
 # -------------------------------------------------
 app.include_router(birds.router, prefix="/api/birds", tags=["Birds"])
+app.include_router(devices.router, prefix="/api/devices", tags=["Devices"])
+app.include_router(sensors.router, prefix="/api/sensors", tags=["Sensors"])
+app.include_router(vision.router, prefix="/api/vision", tags=["Vision"])
 app.include_router(rules.router, prefix="/api/rules", tags=["Rules"])
-
-# Uncomment as modules are ready
-# app.include_router(sensors.router, prefix="/api/sensors", tags=["Sensors"])
-# app.include_router(devices.router, prefix="/api/devices", tags=["Devices"])
-# app.include_router(vision.router, prefix="/api/vision", tags=["Vision"])
-# app.include_router(alerts.router, prefix="/api/alerts", tags=["Alerts"])
 
 # -------------------------------------------------
 # Startup / Shutdown
