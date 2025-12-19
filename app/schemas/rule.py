@@ -1,23 +1,38 @@
+from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
+from app.models.enums import SensorTypeEnum, DeviceTypeEnum, OperatorEnum, ActionValueEnum
 
-class RuleCreate(BaseModel):
-    name: str
-    pen_id: str
-    condition: str
-    action: str
+
+class RuleBase(BaseModel):
+    pen_id: Optional[str] = None  # null = global
+    sensor_type: SensorTypeEnum
+    operator: OperatorEnum
+    threshold: float
+    action_device: DeviceTypeEnum
+    action_value: ActionValueEnum
+    priority: Optional[int] = 1
     enabled: Optional[bool] = True
-    priority: float = 1.0
 
-class RuleRead(BaseModel):
+
+class RuleCreate(RuleBase):
+    pass
+
+
+class RuleUpdate(BaseModel):
+    sensor_type: Optional[SensorTypeEnum] = None
+    operator: Optional[OperatorEnum] = None
+    threshold: Optional[float] = None
+    action_device: Optional[DeviceTypeEnum] = None
+    action_value: Optional[ActionValueEnum] = None
+    priority: Optional[int] = None
+    enabled: Optional[bool] = None
+    pen_id: Optional[str] = None
+
+
+class RuleOut(RuleBase):
     id: str
-    name: str
-    pen_id: str
-    condition: str
-    action: str
-    enabled: bool
     created_at: datetime
 
     class Config:
-        orm_mode = True  # Needed to convert SQLAlchemy objects to Pydantic
+        orm_mode = True

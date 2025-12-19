@@ -1,52 +1,57 @@
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from app.models.bird import Bird
-from app.schemas.bird import BirdCreate, BirdUpdate
-from fastapi import HTTPException
+from datetime import date
+import uuid
 
-# -----------------------------
-# Create
-# -----------------------------
-def create_bird(db: Session, bird_data: BirdCreate) -> Bird:
-    bird = Bird(**bird_data.model_dump())
-    db.add(bird)
-    try:
-        db.commit()
-        db.refresh(bird)
-    except IntegrityError:
-        db.rollback()
-        raise HTTPException(status_code=400, detail="Bird tag_id must be unique")
-    return bird
+def get_bird(db: Session, bird_id: str) -> Bird | None:
+    return db.query(Bird).filter(Bird.id == bird_id).first()
 
-# -----------------------------
-# Read / List
-# -----------------------------
-def get_birds(db: Session, skip: int = 0, limit: int = 100):
+def list_birds(db: Session, skip: int = 0, limit: int = 100) -> list[Bird]:
     return db.query(Bird).offset(skip).limit(limit).all()
 
-def get_bird(db: Session, bird_id: int):
-    bird = db.query(Bird).filter(Bird.id == bird_id).first()
+def create_bird(
+    db: Session,
+    pen_id: str,
+    tag_id: str | None = None,
+    hatch_date: date | None = None,
+    age_days: int | None = None,
+    health_score: float | None = None,
+    status: str = "healthy",
+    id: str | None = None
+) -> Bird:
+    bird = Bird(
+        id=id or str(uuid.uuid4()),
+        pen_id=pen_id,
+        tag_id=tag_id,
+        hatch_date=hatch_date,
+        age_days=age_days,
+        health_score=health_score,
+        status=status
+    )
+    db.add(bird)
+    db.commit()
+    db.refresh(bird)
+    return bird
+
+def update_bird(
+    db: Session,
+    bird_id: str,
+    **kwargs
+) -> Bird | None:
+    bird = get_bird(db, bird_id)
     if not bird:
-        raise HTTPException(status_code=404, detail="Bird not found")
-    return bird
-
-# -----------------------------
-# Update
-# -----------------------------
-def update_bird(db: Session, bird_id: int, bird_data: BirdUpdate):
-    bird = get_bird(db, bird_id)
-    for key, value in bird_data.model_dump(exclude_unset=True).items():
-        setattr(bird, key, value)
+        return None
+    for key, value in kwargs.items():
+        if hasattr(bird, key):
+            setattr(bird, key, value)
     db.commit()
     db.refresh(bird)
     return bird
 
-# -----------------------------
-# Delete / Soft Delete
-# -----------------------------
-def delete_bird(db: Session, bird_id: int):
+def delete_bird(db: Session, bird_id: str) -> Bird | None:
     bird = get_bird(db, bird_id)
-    bird.is_active = False  # soft delete
+    if not bird:
+        return None
+    db.delete(bird)
     db.commit()
-    db.refresh(bird)
     return bird

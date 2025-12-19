@@ -1,23 +1,31 @@
-from pydantic import BaseModel, Field
+from datetime import date
+from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
-from .base import BaseSchema
 
-# ---------- REQUEST SCHEMAS ----------
 
-class BirdCreate(BaseModel):
-    tag_id: str = Field(..., min_length=3, max_length=50)
-    breed: Optional[str] = None
-    hatch_date: Optional[datetime] = None
+class BirdBase(BaseModel):
+    pen_id: str
+    tag_id: Optional[str] = None
+    hatch_date: Optional[date] = None
+    age_days: Optional[int] = None
+    health_score: Optional[float] = None
+    status: str = "healthy"
+
+
+class BirdCreate(BirdBase):
+    pass
+
 
 class BirdUpdate(BaseModel):
-    breed: Optional[str] = None
-    is_active: Optional[bool] = None
+    tag_id: Optional[str] = None
+    hatch_date: Optional[date] = None
+    age_days: Optional[int] = None
+    health_score: Optional[float] = None
+    status: Optional[str] = None
 
-# ---------- RESPONSE SCHEMA ----------
 
-class BirdOut(BaseSchema):
-    tag_id: str
-    breed: Optional[str] = None
-    hatch_date: Optional[datetime] = None
-    is_active: bool
+class BirdOut(BirdBase):
+    id: str
+
+    class Config:
+        orm_mode = True

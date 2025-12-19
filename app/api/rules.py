@@ -1,66 +1,55 @@
-from fastapi import APIRouter, HTTPException
-from app.database import SessionLocal
-from app.models.rule import Rule
-from app.schemas.rule import RuleCreate, RuleRead
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from typing import Sequence
 
-router = APIRouter()
+from app.schemas.rule import RuleCreate, RuleUpdate, RuleOut
+from app.utils.db import get_db
+from app.services.rule_service import (
+    create_rule, get_rule, get_rules, update_rule, delete_rule
+)
 
-# Create rule
-@router.post("", response_model=RuleRead)
-def create_rule(rule: RuleCreate):
-    db = SessionLocal()
+router = APIRouter(tags=["Rules"])
 
-    db_rule = Rule(
-        name=rule.name,
-        pen_id=rule.pen_id,
-        condition=rule.condition,
-        action=rule.action,
-        enabled=rule.enabled,
-        priority=rule.priority
+
+@router.post("", response_model=RuleOut)
+def api_create_rule(payload: RuleCreate, db: Session = Depends(get_db)) -> RuleOut:
+    return create_rule(
+        db,
+        pen_id=payload.pen_id,
+        sensor_type=payload.sensor_type,
+        operator=payload.operator,
+        threshold=payload.threshold,
+        action_device=payload.action_device,
+        action_value=payload.action_value,
+        priority=payload.priority or 1,
+        enabled=payload.enabled if payload.enabled is not None else True
     )
 
-    db.add(db_rule)
-    db.commit()
-    db.refresh(db_rule)
-    db.close()
-    return db_rule
+
+@router.get("", response_model=Sequence[RuleOut])
+def api_list_rules(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)) -> Sequence[RuleOut]:
+    return get_rules(db, skip=skip, limit=limit)
 
 
-# List rules
-@router.get("", response_model=list[RuleRead])
-def list_rules():
-    db = SessionLocal()
-    rules = db.query(Rule).order_by(Rule.priority.desc()).all()
-    db.close()
-    return rules
-
-
-# Update rule
-@router.put("/{rule_id}", response_model=RuleRead)
-def update_rule(
-    rule_id: str,
-    name: str | None = None,
-    action: str | None = None,
-    enabled: bool | None = None,
-    priority: float | None = None
-):
-    db = SessionLocal()
-    rule = db.query(Rule).filter(Rule.id == rule_id).first()
-
+@router.get("/{rule_id}", response_model=RuleOut)
+def api_get_rule(rule_id: str, db: Session = Depends(get_db)) -> RuleOut:
+    rule = get_rule(db, rule_id)
     if not rule:
-        db.close()
         raise HTTPException(status_code=404, detail="Rule not found")
+    return rule
 
-    if name is not None:
-        setattr(rule, "name", name)
-    if action is not None:
-        setattr(rule, "action", action)
-    if enabled is not None:
-        setattr(rule, "enabled", enabled)
-    if priority is not None:
-        setattr(rule, "priority", priority)
 
-    db.commit()
-    db.refresh(rule)
-    db.close()
+@router.put("/{rule_id}", response_model=RuleOut)
+def api_update_rule(rule_id: str, payload: RuleUpdate, db: Session = Depends(get_db)) -> RuleOut:
+    rule = update_rule(db, rule_id, **payload.dict(exclude_unset=True))
+    if not rule:
+        raise HTTPException(status_code=404, detail="Rule not found")
+    return rule
+
+
+@router.delete("/{rule_id}", response_model=RuleOut)
+def api_delete_rule(rule_id: str, db: Session = Depends(get_db)) -> RuleOut:
+    rule = delete_rule(db, rule_id)
+    if not rule:
+        raise HTTPException(status_code=404, detail="Rule not found")
     return rule
