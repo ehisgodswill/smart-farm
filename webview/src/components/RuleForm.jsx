@@ -3,6 +3,7 @@ import { createRule } from "../api/rules";
 
 export default function RuleForm ({ onSaved }) {
   const [form, setForm] = useState({
+    name: "",
     pen_id: "",
     sensor_type: "temperature",
     operator: ">",
@@ -13,53 +14,122 @@ export default function RuleForm ({ onSaved }) {
   });
 
   function handleChange (e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setForm({
+      ...form,
+      [name]: type === "checkbox" ? checked : value
+    });
   }
 
   async function handleSubmit (e) {
     e.preventDefault();
-    await createRule(form);
+
+    const payload = {
+      name: form.name,
+      pen_id: form.pen_id || null,
+      condition: `${form.sensor_type} ${form.operator} ${form.threshold}`,
+      action: `${form.action_device}:${form.action_value}`,
+      enabled: form.enabled
+    };
+
+    await createRule(payload);
     onSaved();
   }
 
   return (
     <form onSubmit={handleSubmit} className="p-4 border mb-4">
-      <div>
-        <label>Pen ID (leave blank = global)</label>
-        <input name="pen_id" value={form.pen_id} onChange={handleChange} />
+
+      <div className="flex gap-5 mb-4">
+        <label>Rule Name</label>
+        <input
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          required
+        />
       </div>
-      <div>
+
+      <div className="flex gap-5 mb-4">
+        <label>Pen ID (leave blank = global)</label>
+        <input
+          name="pen_id"
+          value={form.pen_id}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="flex gap-5 mb-4">
         <label>Sensor Type</label>
-        <select name="sensor_type" value={form.sensor_type} onChange={handleChange}>
+        <select
+          name="sensor_type"
+          value={form.sensor_type}
+          onChange={handleChange}
+        >
           <option value="temperature">Temperature</option>
           <option value="humidity">Humidity</option>
         </select>
       </div>
-      <div>
+
+      <div className="flex gap-5 mb-4">
         <label>Operator</label>
-        <select name="operator" value={form.operator} onChange={handleChange}>
+        <select
+          name="operator"
+          value={form.operator}
+          onChange={handleChange}
+        >
           <option value=">">{">"}</option>
           <option value="<">{"<"}</option>
           <option value=">=">{">="}</option>
           <option value="<=">{"<="}</option>
         </select>
       </div>
-      <div>
+
+      <div className="flex gap-5 mb-4">
         <label>Threshold</label>
-        <input type="number" name="threshold" value={form.threshold} onChange={handleChange} />
+        <input
+          type="number"
+          name="threshold"
+          value={form.threshold}
+          onChange={handleChange}
+        />
       </div>
-      <div>
+
+      <div className="flex gap-5 mb-4">
         <label>Device</label>
-        <input name="action_device" value={form.action_device} onChange={handleChange} />
+        <input
+          name="action_device"
+          value={form.action_device}
+          onChange={handleChange}
+        />
       </div>
-      <div>
+
+      <div className="flex gap-5 mb-4">
         <label>Action</label>
-        <select name="action_value" value={form.action_value} onChange={handleChange}>
+        <select
+          name="action_value"
+          value={form.action_value}
+          onChange={handleChange}
+        >
           <option value="ON">ON</option>
           <option value="OFF">OFF</option>
         </select>
       </div>
-      <button type="submit" className="mt-2 p-2 bg-blue-500 text-white">Save Rule</button>
+
+      <div className="flex gap-5 mb-4">
+        <label>
+          <input
+            type="checkbox"
+            name="enabled"
+            checked={form.enabled}
+            onChange={handleChange}
+          />
+          Enabled
+        </label>
+      </div>
+
+      <button type="submit" className="mt-2 p-2 bg-blue-500 text-white">
+        Save Rule
+      </button>
     </form>
   );
 }

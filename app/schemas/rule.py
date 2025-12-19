@@ -8,6 +8,7 @@ class RuleCreate(BaseModel):
     condition: str
     action: str
     enabled: Optional[bool] = True
+    priority: float = 1.0
 
 class RuleRead(BaseModel):
     id: str
