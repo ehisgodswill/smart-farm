@@ -1,31 +1,33 @@
-interface Alert {
-  id: string;
-  type: string; // sick, sensor_high, device_failed
-  message: string;
-  pen_id: string;
-  timestamp: string;
+import { VisionEvent } from "../types/visionEvent";
+
+interface Props {
+  events: VisionEvent[];
 }
 
-interface AlertsPanelProps {
-  alerts: Alert[];
-}
+const severityColor: Record<string, string> = {
+  sick: "red",
+  abnormal_behavior: "orange",
+  aggression: "purple",
+};
 
-export function AlertsPanel({ alerts }: AlertsPanelProps) {
+export function AlertsPanel({ events }: Props) {
+  if (!events.length) {
+    return <div>No alerts</div>;
+  }
+
   return (
-    <div className="bg-gray-900 text-white p-4 rounded shadow-md">
-      <h3 className="text-lg font-bold mb-2">Alerts</h3>
-      {alerts.length === 0 ? (
-        <p className="text-gray-400">No alerts</p>
-      ) : (
-        <ul className="space-y-2 max-h-64 overflow-y-auto">
-          {alerts.map((alert) => (
-            <li key={alert.id} className="flex justify-between items-center border-b border-gray-700 pb-1">
-              <span className="text-sm">{alert.message}</span>
-              <span className="text-xs text-gray-400">{new Date(alert.timestamp).toLocaleTimeString()}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+    <div style={{ marginTop: 24 }}>
+      <h4>Alerts</h4>
+
+      <ul>
+        {events.slice(0, 10).map((e) => (
+          <li key={e.id} style={{ color: severityColor[e.type] || "black" }}>
+            <strong>{e.type.replace("_", " ")}</strong>{" "}
+            ({Math.round((e.confidence ?? 0) * 100)}%) –{" "}
+            {new Date(e.timestamp).toLocaleTimeString()}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

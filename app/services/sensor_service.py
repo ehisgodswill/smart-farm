@@ -70,6 +70,7 @@ def create_sensor_reading(
     reading = SensorReading(
         sensor_id=sensor.id,
         pen_id=pen_id,
+        sensor_type=sensor.type,
         value=value,
         timestamp=timestamp or datetime.now(timezone.utc)
     )

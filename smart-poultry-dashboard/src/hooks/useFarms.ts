@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import * as api from "../api/farms";
-import { queryClient } from "../helper/queryClient";
+import { queryClient } from "../utils/queryClient";
 
 export const useFarms = () =>
   useQuery({

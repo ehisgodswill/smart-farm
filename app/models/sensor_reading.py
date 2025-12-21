@@ -1,7 +1,8 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import String, Float, DateTime, ForeignKey, Index
+from sqlalchemy import String, Float, DateTime, ForeignKey, Index, Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from app.models.enums import SensorTypeEnum
 
 from app.database import Base
 
@@ -25,6 +26,12 @@ class SensorReading(Base):
     pen_id: Mapped[str] = mapped_column(
         String,
         ForeignKey("pens.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+    
+    sensor_type: Mapped[SensorTypeEnum] = mapped_column(
+        SQLEnum(SensorTypeEnum, name="sensor_type_enum"),
         nullable=False,
         index=True
     )
