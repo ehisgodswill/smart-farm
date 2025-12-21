@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../api/client";
+import { api } from "../utils/api";
 import { VisionEvent } from "../types/visionEvent";
 
 export const useVisionEvents =(penId: string) => {

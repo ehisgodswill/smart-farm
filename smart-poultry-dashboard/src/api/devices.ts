@@ -1,4 +1,4 @@
-import { api } from "./client";
+import { api } from "../utils/api";
 import { Device, DeviceCreate } from "../types/device";
 
 export const listDevices = (penId?: string) =>

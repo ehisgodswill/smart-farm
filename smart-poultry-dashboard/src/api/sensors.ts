@@ -1,4 +1,4 @@
-import { api } from "./client";
+import { api } from "../utils/api";
 import { Sensor, SensorCreate } from "../types/sensor";
 
 export const listSensors = (penId?: string) =>

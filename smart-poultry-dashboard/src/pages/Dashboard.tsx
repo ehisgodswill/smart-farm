@@ -1,56 +1,57 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
-import { PenCard } from "../components/PenCard";
-import { VisionEventsTimeline } from "../components/VisionEventsTimeline";
+import { useParams } from "react-router-dom";
+import { useSensorReadings } from "../hooks/useSensorReadings";
+import { useVisionEvents } from "../hooks/useVisionEvents";
+import { useDeviceCommands } from "../hooks/useDeviceCommands";
+import { useLiveSensorReadings } from "../hooks/useLiveSensorReadings";
+import { useLiveVisionEvents } from "../hooks/useLiveVisionEvents";
+import { useLiveDeviceCommands } from "../hooks/useLiveDeviceCommands";
+
+import { LiveSensorChart } from "../components/LiveSensorCharts";
 import { AlertsPanel } from "../components/AlertsPanel";
-import { fetchPens, fetchDevices, fetchVisionEvents } from "../api";
-import { useWebSocket } from "../hooks/useWebSocket";
+import { DeviceActionsLog } from "../components/DeviceActionsLog";
+import { computePenStatus } from "../utils/penStatus";
 
-export function Dashboard() {
-  const [pens, setPens] = useState<any[]>([]);
-  const [devices, setDevices] = useState<any[]>([]);
-  const [visionEvents, setVisionEvents] = useState<any[]>([]);
-  const [alerts, setAlerts] = useState<any[]>([]);
+export default function Dashboard() {
+  const { penId } = useParams<{ penId: string }>();
 
-  const wsMessages: any[] = useWebSocket("ws://localhost:8000/ws"); // WebSocket server for live updates
+  const { data: readings = [] } = useSensorReadings(penId!);
+  const { data: events = [] } = useVisionEvents(penId!);
+  const { data: commands = [] } = useDeviceCommands(penId!);
 
-  useEffect(() => {
-    fetchPens().then(setPens);
-    fetchDevices().then(setDevices);
-    fetchVisionEvents().then(setVisionEvents);
-  }, []);
+  useLiveSensorReadings(penId!);
+  useLiveVisionEvents();
+  useLiveDeviceCommands();
 
-  useEffect(() => {
-    // Handle live messages
-    wsMessages.forEach((msg) => {
-      if (msg.type === "vision_event") {
-        setVisionEvents((prev) => [msg, ...prev].slice(0, 50));
-        setAlerts((prev) => [{ id: msg.id, type: msg.type, message: `Event: ${msg.type} in Pen ${msg.pen_id}`, pen_id: msg.pen_id, timestamp: msg.timestamp }, ...prev].slice(0, 20));
-      }
-      if (msg.type === "device_command_failed") {
-        setAlerts((prev) => [{ ...msg, message: `Device ${msg.device_id} failed`, timestamp: msg.timestamp }, ...prev].slice(0, 20));
-      }
-    });
-  }, [wsMessages]);
+  const status = computePenStatus( readings, events);
 
   return (
-    <div className="p-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
-      {/* Pens grid */}
-      <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-        {pens.map((pen) => (
-          <PenCard
-            key={pen.id}
-            name={pen.name}
-            readings={pen.readings || []}
-            devices={devices.filter((d) => d.pen_id === pen.id)}
-          />
-        ))}
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-green-800">Pen {penId}</h2>
+      <div className="flex gap-4 items-center mb-4">
+        <span className={`px-3 py-1 rounded-full font-bold ${status.level === "normal" ? "bg-green-400 text-white" :
+            status.level === "warning" ? "bg-yellow-400 text-white" :
+              "bg-red-500 text-white"
+          }`}>
+          Status: {status.level.toUpperCase()}
+        </span>
       </div>
 
-      {/* Right side: Vision Events + Alerts */}
-      <div className="space-y-4">
-        <VisionEventsTimeline events={visionEvents} />
-        <AlertsPanel alerts={alerts} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <LiveSensorChart
+          readings={readings.filter((r) => r.sensor_type === "temperature")}
+          label="Temperature"
+          unit="°C"
+        />
+        <LiveSensorChart
+          readings={readings.filter((r) => r.sensor_type === "humidity")}
+          label="Humidity"
+          unit="%"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <AlertsPanel events={events} />
+        <DeviceActionsLog commands={commands} />
       </div>
     </div>
   );

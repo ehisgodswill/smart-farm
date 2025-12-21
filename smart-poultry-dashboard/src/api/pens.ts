@@ -1,4 +1,4 @@
-import { api } from "./client";
+import { api } from "../utils/api";
 import { Pen, PenCreate, PenUpdate } from "../types/pen";
 
 export const listPens = () => api<Pen[]>("/pens");

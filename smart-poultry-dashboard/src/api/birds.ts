@@ -1,4 +1,4 @@
-import { api } from "./client";
+import { api } from "../utils/api";
 import { Bird, BirdCreate, BirdUpdate } from "../types/bird";
 
 export const listBirds = (penId?: string) =>

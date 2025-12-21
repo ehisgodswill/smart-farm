@@ -1,33 +1,22 @@
+import { Card, Typography } from "@mui/material";
 import { VisionEvent } from "../types/visionEvent";
 
-interface Props {
-  events: VisionEvent[];
-}
-
-const severityColor: Record<string, string> = {
-  sick: "red",
-  abnormal_behavior: "orange",
-  aggression: "purple",
-};
-
-export function AlertsPanel({ events }: Props) {
-  if (!events.length) {
-    return <div>No alerts</div>;
-  }
-
+export function AlertsPanel({ events }: { events: VisionEvent[] }) {
   return (
-    <div style={{ marginTop: 24 }}>
-      <h4>Alerts</h4>
-
-      <ul>
-        {events.slice(0, 10).map((e) => (
-          <li key={e.id} style={{ color: severityColor[e.type] || "black" }}>
-            <strong>{e.type.replace("_", " ")}</strong>{" "}
-            ({Math.round((e.confidence ?? 0) * 100)}%) –{" "}
-            {new Date(e.timestamp).toLocaleTimeString()}
-          </li>
+    <Card className="mt-6 p-4">
+      <Typography variant="h6" className="font-bold mb-4 text-yellow-800">
+        Alerts
+      </Typography>
+      <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
+        {events.map((e) => (
+          <div
+            key={e.id}
+            className="p-2 rounded bg-yellow-100 text-yellow-900 shadow-sm"
+          >
+            {e.type} - {new Date(e.timestamp).toLocaleTimeString()}
+          </div>
         ))}
-      </ul>
-    </div>
+      </div>
+    </Card>
   );
 }

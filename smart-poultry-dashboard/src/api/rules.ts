@@ -1,4 +1,4 @@
-import { api } from "./client";
+import { api } from "../utils/api";
 import { Rule, RuleCreate, RuleUpdate } from "../types/rule";
 
 export const listRules = () => api<Rule[]>("/rules");

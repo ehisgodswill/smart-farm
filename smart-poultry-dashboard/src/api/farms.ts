@@ -1,4 +1,4 @@
-import { api } from "./client";
+import { api } from "../utils/api";
 import { Farm, FarmCreate, FarmUpdate } from "../types/farm";
 
 export const listFarms = () => api<Farm[]>("/farms");
