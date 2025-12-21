@@ -22,7 +22,7 @@ export function PenDashboard() {
   useLiveVisionEvents();
   useLiveDeviceCommands();
 
-  const status = computePenStatus(penId!, readings, events);
+  const status = computePenStatus(readings, events);
 
   return (
     <div>

@@ -29,7 +29,7 @@ app.include_router(birds.router, prefix="/api/birds", tags=["Birds"])
 app.include_router(devices.router, prefix="/api/devices", tags=["Devices"])
 app.include_router(pens.router, prefix="/api/pens", tags=["Pens"])
 app.include_router(sensors.router, prefix="/api/sensors", tags=["Sensors"])
-app.include_router(sensor_readings.router, prefix="/api/sensor-readings", tags=["Sensor-Readings"])
+app.include_router(sensor_readings.router, prefix="/api/sensor-readings", tags=["Sensor Readings"])
 app.include_router(rules.router, prefix="/api/rules", tags=["Rules"])
 app.include_router(vision_events.router, prefix="/api/vision-events", tags=["Vision"])
 

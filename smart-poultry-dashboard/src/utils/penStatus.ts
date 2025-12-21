@@ -2,7 +2,6 @@ import { SensorReading } from "../types/sensorReading";
 import { VisionEvent } from "../types/visionEvent";
 
 export function computePenStatus(
-  penId: string,
   readings: SensorReading[],
   events: VisionEvent[]
 ) {

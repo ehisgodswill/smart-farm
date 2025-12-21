@@ -1,7 +1,8 @@
-import { Dashboard } from "./pages/Dashboard";
+// import { Dashboard } from "./pages/Dashboard";
+import { PenDashboard } from "./pages/PenDashboard";
 
 function App() {
-  return <Dashboard />;
+  return <PenDashboard />;
 }
 
 export default App;
