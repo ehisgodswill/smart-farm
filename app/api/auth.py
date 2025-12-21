@@ -12,7 +12,7 @@ from app.schemas.auth import (
 from app.services.auth_service import get_current_user, login, refresh_token, register
 from app.models.user import User
 
-router = APIRouter(prefix="/auth", tags=["Authentication"])
+router = APIRouter(tags=["Authentication"])
 
 
 @router.post("/register", response_model=UserResponse)
@@ -22,8 +22,7 @@ def api_register(payload: RegisterRequest, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=TokenResponse)
 def api_login(payload: LoginRequest, db: Session = Depends(get_db)):
-    token = login(db, payload.username, payload.password)
-    return {"access_token": token}
+    return login(db, payload.username, payload.password)
 
 
 @router.get("/me", response_model=UserResponse)

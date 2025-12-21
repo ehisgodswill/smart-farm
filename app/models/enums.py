@@ -22,9 +22,9 @@ class OperatorEnum(str, Enum):
     NEQ = "!="
 
 class UserRoleEnum(str, Enum):
-    ADMIN = "admin"
-    FARM_MANAGER = "farm_manager"
-    STAFF = "staff"
+    ADMIN = "ADMIN"
+    FARM_MANAGER = "FARM_MANAGER"
+    STAFF = "STAFF"
 
 class ActionValueEnum(str, Enum):
     ON = "ON"

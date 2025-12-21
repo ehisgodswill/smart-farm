@@ -15,7 +15,7 @@ export async function api<T>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("access_token");
 
   const res = await fetch(`${API_BASE}${path}`, {
     credentials: "include",

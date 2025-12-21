@@ -20,7 +20,7 @@ from app.utils.security import (
 )
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 
 def register(db: Session, payload: RegisterRequest) -> User:

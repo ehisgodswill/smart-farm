@@ -1,14 +1,22 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Button, TextField, Card, Typography, CircularProgress } from "@mui/material";
-import { useAuth } from "../hooks/useAuth";
+import {
+  Button,
+  TextField,
+  Card,
+  Typography,
+  MenuItem,
+  CircularProgress,
+} from "@mui/material";
+import { AuthAPI } from "../api/auth";
 
-export default function LoginPage() {
-  const { login } = useAuth();
+export default function RegisterPage() {
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("MANAGER");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -18,10 +26,15 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await login(username, password);
-      navigate("/");
+      await AuthAPI.register({
+        username,
+        email,
+        password,
+        role,
+      });
+      navigate("/login");
     } catch {
-      setError("Login failed");
+      setError("Registration failed");
     } finally {
       setLoading(false);
     }
@@ -29,12 +42,12 @@ export default function LoginPage() {
 
   return (
     <div className="h-screen flex items-center justify-center bg-gradient-to-br from-green-500 via-green-400 to-yellow-300">
-      <Card className="p-8 w-96 shadow-xl rounded-xl">
+      <Card className="p-8 w-[420px] shadow-xl rounded-xl">
         <Typography
           variant="h5"
           className="mb-6 text-center font-bold text-green-800"
         >
-          Smart Poultry Login
+          Create Account
         </Typography>
 
         {error && (
@@ -48,7 +61,15 @@ export default function LoginPage() {
             label="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            fullWidth
+            required
+            disabled={loading}
+          />
+
+          <TextField
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
             disabled={loading}
           />
@@ -58,10 +79,21 @@ export default function LoginPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            fullWidth
             required
             disabled={loading}
           />
+
+          <TextField
+            select
+            label="Role"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            disabled={loading}
+          >
+            {/* <MenuItem value="ADMIN">Admin</MenuItem> */}
+            <MenuItem value="FARM_MANAGER">Manager</MenuItem>
+            <MenuItem value="STAFF">Staff</MenuItem>
+          </TextField>
 
           <Button
             type="submit"
@@ -70,14 +102,14 @@ export default function LoginPage() {
             disabled={loading}
             className="bg-green-600 hover:bg-green-700"
           >
-            {loading ? <CircularProgress size={22} /> : "Login"}
+            {loading ? <CircularProgress size={22} /> : "Register"}
           </Button>
         </form>
 
         <Typography className="mt-4 text-center text-sm text-gray-600">
-          Don’t have an account?{" "}
-          <Link to="/register" className="text-green-700 font-medium">
-            Register
+          Already have an account?{" "}
+          <Link to="/login" className="text-green-700 font-medium">
+            Login
           </Link>
         </Typography>
       </Card>

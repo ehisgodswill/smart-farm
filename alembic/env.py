@@ -14,6 +14,7 @@ from app.models.device import Device
 from app.models.device_command import DeviceCommand
 from app.models.farm import Farm
 from app.models.pen import Pen
+from app.models.refresh_token import RefreshToken
 from app.models.rule import Rule
 from app.models.sensor import Sensor
 from app.models.sensor_reading import SensorReading
