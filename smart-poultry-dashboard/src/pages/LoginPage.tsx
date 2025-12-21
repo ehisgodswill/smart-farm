@@ -35,7 +35,7 @@ export default function LoginPage() {
 
         {error && <Typography color="error">{error}</Typography>}
 
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <form className="flex flex-col gap-6 mt-2" onSubmit={handleSubmit}>
           <TextField
             label="Username"
             variant="outlined"
