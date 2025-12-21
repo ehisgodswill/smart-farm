@@ -1,12 +1,9 @@
-import { JSX } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
+import Layout from "./Layout";
 
-interface Props {
-  children: JSX.Element;
-}
-
-export default function RequireAuth({ children }: Props) {
+export default function RequireAuth() {
   const token = localStorage.getItem("token");
-  if (!token) return <Navigate to="/login" />;
-  return children;
+  if (token) return <Navigate to="/login" />;
+
+  return <Layout><Outlet /></Layout>;
 }

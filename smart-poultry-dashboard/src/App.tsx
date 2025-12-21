@@ -10,14 +10,15 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <RequireAuth>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/farms" element={<FarmsPage />} />
-            <Route path="/pens" element={<PensPage />} />
-            {/* Add more pages: Devices, Sensors, Rules, VisionEvents */}
-          </Routes>
-        </RequireAuth>
+
+        {/* Protected routes */}
+        <Route element={<RequireAuth />}>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/farms" element={<FarmsPage />} />
+          <Route path="/pens" element={<PensPage />} />
+          {/* Add more protected routes here */}
+        </Route>
+
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>

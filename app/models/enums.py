@@ -23,7 +23,8 @@ class OperatorEnum(str, Enum):
 
 class UserRoleEnum(str, Enum):
     ADMIN = "admin"
-    OPERATOR = "operator"
+    FARM_MANAGER = "farm_manager"
+    STAFF = "staff"
 
 class ActionValueEnum(str, Enum):
     ON = "ON"
