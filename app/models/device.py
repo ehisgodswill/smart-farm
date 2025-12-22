@@ -1,9 +1,14 @@
-from datetime import datetime, timezone
+from datetime import datetime
+from typing import TYPE_CHECKING, List
 from sqlalchemy import ForeignKey, String, DateTime, Enum as SQLEnum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 from app.models.enums import DeviceTypeEnum, ActionValueEnum
+
+if TYPE_CHECKING:
+    from app.models.device_command import DeviceCommand
+    from app.models.pen import Pen
 
 
 class Device(Base):
@@ -18,7 +23,6 @@ class Device(Base):
         String,
         ForeignKey("pens.id", ondelete="CASCADE"),
         nullable=False,
-        index=True
     )
 
     type: Mapped[DeviceTypeEnum] = mapped_column(
@@ -36,3 +40,7 @@ class Device(Base):
         DateTime(timezone=True),
         nullable=True
     )
+
+    pen: Mapped["Pen"] = relationship("Pen", back_populates="devices")
+
+    commands: Mapped[List["DeviceCommand"]] = relationship("DeviceCommand", back_populates="device")

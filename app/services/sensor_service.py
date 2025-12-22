@@ -9,15 +9,14 @@ from app.services.rule_engine_service import evaluate_rules_for_sensor
 def get_sensor(db: Session, sensor_id: str) -> Sensor | None:
     return db.query(Sensor).filter(Sensor.id == sensor_id).first()
 
-def get_sensors(db: Session, skip: int = 0, limit: int = 100) -> list[Sensor]:
-    return db.query(Sensor).offset(skip).limit(limit).all()
+def get_sensors_by_pen(db: Session, pen_id: str):
+    return db.query(Sensor).filter(Sensor.pen_id == pen_id).all()
 
 def create_sensor(
     db: Session,
     pen_id: str,
     type: str,
     device_id: str | None = None,
-    id: str | None = None
 ) -> Sensor:
     sensor = Sensor(
         id=id or str(uuid.uuid4()),

@@ -1,10 +1,13 @@
+from typing import TYPE_CHECKING
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import String, Float, DateTime, ForeignKey, Index, Enum as SQLEnum
+from sqlalchemy import String, Float, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.models.enums import SensorTypeEnum
 
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.models.sensor import Sensor
 
 
 class SensorReading(Base):
@@ -29,12 +32,6 @@ class SensorReading(Base):
         nullable=False,
         index=True
     )
-    
-    sensor_type: Mapped[SensorTypeEnum] = mapped_column(
-        SQLEnum(SensorTypeEnum, name="sensor_type_enum"),
-        nullable=False,
-        index=True
-    )
 
     value: Mapped[float] = mapped_column(
         Float,
@@ -48,11 +45,7 @@ class SensorReading(Base):
         index=True
     )
 
-    sensor = relationship(
+    sensor: Mapped["Sensor"] = relationship(
         "Sensor",
         back_populates="readings"
-    )
-
-    __table_args__ = (
-        Index("ix_sensor_pen_time", "sensor_id", "pen_id", "timestamp"),
     )

@@ -1,31 +1,20 @@
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional
-from app.models.enums import DeviceTypeEnum, ActionValueEnum, CommandStatusEnum
+from app.models.enums import ActionValueEnum
 
 
-class DeviceCommandBase(BaseModel):
-    device_id: str
-    device_type: DeviceTypeEnum
+class DeviceCommandCreate(BaseModel):
     action: ActionValueEnum
-    source: str  # e.g., "rule_engine", "admin", "system"
-    rule_id: Optional[str] = None
+    source: str = "manual"
 
 
-class DeviceCommandCreate(DeviceCommandBase):
-    pass
-
-
-class DeviceCommandUpdate(BaseModel):
-    status: Optional[CommandStatusEnum] = None
-    executed_at: Optional[datetime] = None
-
-
-class DeviceCommandOut(DeviceCommandBase):
+class DeviceCommandOut(BaseModel):
     id: str
-    status: CommandStatusEnum
-    created_at: datetime
-    executed_at: Optional[datetime] = None
+    device_id: str
+    pen_id: str
+    action: ActionValueEnum
+    source: str
+    issued_at: datetime
 
     class Config:
         from_attributes = True

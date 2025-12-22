@@ -1,26 +1,20 @@
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional
 from app.models.enums import SensorTypeEnum
 
-
 class SensorBase(BaseModel):
-    pen_id: str
     type: SensorTypeEnum
-    device_id: Optional[str] = None
-
+    device_id: str | None = None  # MCU channel
 
 class SensorCreate(SensorBase):
-    pass
-
+    pen_id: str
 
 class SensorUpdate(BaseModel):
-    type: Optional[SensorTypeEnum] = None
-    device_id: Optional[str] = None
-
+    device_id: str | None = None
 
 class SensorOut(SensorBase):
     id: str
+    pen_id: str
     created_at: datetime
 
     class Config:

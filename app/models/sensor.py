@@ -1,3 +1,4 @@
+from typing import List
 import uuid
 from datetime import datetime, timezone
 from sqlalchemy import String, DateTime, ForeignKey, Enum as SQLEnum
@@ -5,6 +6,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 from app.models.enums import SensorTypeEnum
+from app.models.pen import Pen
+from app.models.sensor_reading import SensorReading
 
 
 class Sensor(Base):
@@ -39,7 +42,9 @@ class Sensor(Base):
         nullable=False
     )
 
-    readings = relationship(
+    pen: Mapped[Pen] = relationship("Pen", back_populates="sensors")
+
+    readings: Mapped[List[SensorReading]] = relationship(
         "SensorReading",
         back_populates="sensor",
         cascade="all, delete-orphan"

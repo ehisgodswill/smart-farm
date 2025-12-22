@@ -5,7 +5,7 @@ from typing import List, Sequence
 from app.schemas.sensor import SensorCreate, SensorUpdate, SensorOut
 from app.utils.db import get_db
 from app.services.sensor_service import (
-    create_sensor, get_sensor, get_sensors, update_sensor, delete_sensor
+    create_sensor, get_sensor, get_sensors_by_pen, update_sensor, delete_sensor
 )
 
 router = APIRouter(tags=["Sensors"])
@@ -21,9 +21,9 @@ def api_create_sensor(payload: SensorCreate, db: Session = Depends(get_db)) -> S
     )
 
 
-@router.get("", response_model=List[SensorOut])
-def api_list_sensors(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)) -> Sequence[SensorOut]:
-    return get_sensors(db, skip=skip, limit=limit)
+@router.get("/pens/{pen_id}", response_model=List[SensorOut])
+def api_list_sensors_by_pen( pen_id: str, db: Session = Depends(get_db)) -> Sequence[SensorOut]:
+    return get_sensors_by_pen(db, pen_id)
 
 
 @router.get("/{sensor_id}", response_model=SensorOut)

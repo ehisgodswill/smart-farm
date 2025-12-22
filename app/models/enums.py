@@ -9,6 +9,7 @@ class SensorTypeEnum(str, Enum):
 
 class DeviceTypeEnum(str, Enum):
     FAN = "fan"
+    HEATER = "heater"
     FEEDER = "feeder"
     LIGHT = "light"
     ALARM = "alarm"

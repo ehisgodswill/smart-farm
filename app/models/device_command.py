@@ -1,11 +1,15 @@
+from typing import TYPE_CHECKING
 import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import ForeignKey, String, DateTime, Enum as SQLEnum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
-from app.models.enums import DeviceTypeEnum, ActionValueEnum, CommandStatusEnum
+from app.models.enums import ActionValueEnum
+
+if TYPE_CHECKING:
+    from app.models.device import Device
 
 
 class DeviceCommand(Base):
@@ -19,13 +23,16 @@ class DeviceCommand(Base):
 
     device_id: Mapped[str] = mapped_column(
         String,
+        ForeignKey("devices.id", ondelete="CASCADE"),
         nullable=False,
         index=True
     )
 
-    device_type: Mapped[DeviceTypeEnum] = mapped_column(
-        SQLEnum(DeviceTypeEnum, name="device_type_enum"),
-        nullable=False
+    pen_id: Mapped[str] = mapped_column(
+        String,
+        ForeignKey("pens.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
     )
 
     action: Mapped[ActionValueEnum] = mapped_column(
@@ -35,28 +42,15 @@ class DeviceCommand(Base):
 
     source: Mapped[str] = mapped_column(
         String,
-        nullable=False  # rule_engine | admin | system
+        nullable=False  # rule | admin | system |manual | safety | ai
     )
 
-    rule_id: Mapped[str | None] = mapped_column(
-        String,
-        ForeignKey("rules.id"),
-        nullable=True
-    )
-
-    status: Mapped[CommandStatusEnum] = mapped_column(
-        SQLEnum(CommandStatusEnum, name="command_status_enum"),
-        default=CommandStatusEnum.pending,
-        index=True
-    )
-
-    created_at: Mapped[datetime] = mapped_column(
+    issued_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         nullable=False
     )
 
-    executed_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True),
-        nullable=True
-    )
+
+    device: Mapped["Device"] = relationship("Device", back_populates="commands")
+

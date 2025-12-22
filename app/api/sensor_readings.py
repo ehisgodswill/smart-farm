@@ -22,17 +22,15 @@ def api_create_sensor_reading(
 ):
     return ingest_sensor_reading(db, payload.model_dump())
 
-@router.get("", response_model=List[SensorReadingOut])
-def api_list_sensor_readings(
+@router.get("/pens/{pen_id}", response_model=List[SensorReadingOut])
+def api_get_sensor_readings_by_pen(
     pen_id: str,
-    sensor_type: str | None = None,
-    limit: int = 100,
+    limit: int = 200,
     db: Session = Depends(get_db),
 ):
     return get_sensor_readings(
         db,
         pen_id=pen_id,
-        sensor_type=sensor_type,
         limit=limit,
     )
 
