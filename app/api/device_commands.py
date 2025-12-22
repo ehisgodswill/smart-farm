@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List, Sequence
+from typing import Sequence
 
 from app.schemas.device_command import DeviceCommandCreate, DeviceCommandUpdate, DeviceCommandOut
 from app.utils.db import get_db

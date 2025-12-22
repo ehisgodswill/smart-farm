@@ -7,4 +7,4 @@ class BaseSchema(BaseModel):
     updated_at: datetime | None = None
 
     class Config:
-        from_attributes = True  # Pydantic v2 (orm_mode replacement)
+        from_attributes = True

@@ -85,7 +85,7 @@ export default function PensPage() {
             <div>
               <h3 className="text-lg font-bold">{pen.name}</h3>
               <p className="text-gray-600">Capacity: {pen.capacity}</p>
-              <p className="text-gray-600">Farm ID: {pen.farm_id}</p>
+              {/* <p className="text-gray-600">Farm ID: {pen.farm_id}</p> */}
             </div>
             <div className="flex gap-2">
               <Button

@@ -16,8 +16,9 @@ class Device(Base):
 
     pen_id: Mapped[str] = mapped_column(
         String,
-        ForeignKey("pens.id"),
-        nullable=False
+        ForeignKey("pens.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
     )
 
     type: Mapped[DeviceTypeEnum] = mapped_column(
