@@ -23,6 +23,13 @@ def get_devices(
     )
 
 
+def get_devices_by_pen(
+    db: Session,
+    pen_id: str
+) -> list[Device]:
+    return db.query(Device).filter(Device.pen_id == pen_id).all()
+
+
 def create_device(
     db: Session,
     pen_id: str,

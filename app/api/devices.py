@@ -2,12 +2,15 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Sequence
 
+from app.utils.roles import require_admin
+from app.models.user import User
 from app.schemas.device import DeviceCreate, DeviceUpdate, DeviceOut
 from app.utils.db import get_db
 from app.services.device_service import (
     create_device,
     get_device,
     get_devices,
+    get_devices_by_pen,
     update_device,
     delete_device,
 )
@@ -31,7 +34,8 @@ def api_create_device(
 def api_list_devices(
     skip: int = 0,
     limit: int = 100,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: User = Depends(require_admin),
 ) -> Sequence[DeviceOut]:
     return get_devices(db, skip=skip, limit=limit)
 
@@ -45,6 +49,14 @@ def api_get_device(
     if not device:
         raise HTTPException(status_code=404, detail="Device not found")
     return device
+
+
+@router.get("/pen/{pen_id}", response_model=List[DeviceOut])
+def api_list_devices_by_pen(
+    pen_id: str,
+    db: Session = Depends(get_db)
+):
+    return get_devices_by_pen(db, pen_id)
 
 
 @router.put("/{device_id}", response_model=DeviceOut)

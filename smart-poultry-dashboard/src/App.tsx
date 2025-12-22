@@ -7,6 +7,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import RegisterPage from "./pages/RegisterPage";
+import DevicesPage from "./pages/DevicesPage";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
               <Layout><Outlet /></Layout>
             </ProtectedRoute>}>
             <Route index element={<Dashboard />} />
+            <Route path="/devices" element={<DevicesPage />} />
             <Route path="/farms" element={<FarmsPage />} />
             <Route path="/pens" element={<PensPage />} />
 
