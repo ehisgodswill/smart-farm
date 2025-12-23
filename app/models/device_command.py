@@ -51,6 +51,8 @@ class DeviceCommand(Base):
         index=True
     )
 
+    ack_at = mapped_column(DateTime(timezone=True), nullable=True)
+
     issued_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),

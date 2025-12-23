@@ -1,13 +1,32 @@
 from typing import List
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+import logging
 
 from app.api import auth, birds, devices, farms, pens, rules, sensors, sensor_readings, vision_events
-from app.mqtt.client import start_mqtt
+from app.mqtt.client import start_mqtt, stop_mqtt
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    logger.info("Starting up application")
+    start_mqtt()
+    yield
+    # Shutdown
+    logger.info("Shutting down application")
+    stop_mqtt()
+
 
 app = FastAPI(
     title="Smart Poultry Server",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan  # Use lifespan instead of deprecated events
 )
 
 # -------------------------------------------------

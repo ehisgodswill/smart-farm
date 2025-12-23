@@ -3,7 +3,7 @@ from app.models.sensor_reading import SensorReading
 from app.models.rule import Rule
 from app.models.enums import ActionValueEnum, OperatorEnum
 from app.models.vision_event import VisionEvent
-from app.services.device_command_service import create_device_command
+from app.services.device_command_service import issue_device_command
 from app.services.rule_action_executor import execute_device_action
 
 OPERATORS = {
@@ -56,13 +56,11 @@ def evaluate_rules_for_reading(db: Session, reading: SensorReading):
         op_func = OPERATORS.get(rule.operator)
         if op_func and op_func(reading.value, rule.threshold):
             # Trigger device action
-            create_device_command(
+            issue_device_command(
                 db,
                 device_id=f"auto-{rule.action_device}-{reading.pen_id}",
-                device_type=rule.action_device,
                 action=rule.action_value,
                 source="rule_engine",
-                rule_id=rule.id
             )
 
 def evaluate_rules_for_vision_event(db: Session, event: VisionEvent):
@@ -79,11 +77,9 @@ def evaluate_rules_for_vision_event(db: Session, event: VisionEvent):
         action_value = VISION_EVENT_MAP.get(event.type)
         if action_value:
             # Trigger device command
-            create_device_command(
+            issue_device_command(
                 db=db,
                 device_id=f"auto-{rule.action_device}-{event.pen_id}",
-                device_type=rule.action_device,
                 action=ActionValueEnum[action_value],
                 source="vision_engine",
-                rule_id=rule.id
             )

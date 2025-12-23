@@ -1,39 +1,47 @@
-import hashlib
-import hmac
+# app/utils/security.py
 import uuid
 from datetime import datetime, timedelta, timezone
 from jose import jwt
+from passlib.context import CryptContext
 
-SECRET_KEY = "CHANGE_THIS_IN_ENV"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
+from app.config import settings
 
-PASSWORD_SALT = b"CHANGE_THIS_SALT"
-
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
-REFRESH_TOKEN_EXPIRE_DAYS = 30
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def hash_password(password: str) -> str:
-    return hashlib.pbkdf2_hmac(
-        "sha256",
-        password.encode(),
-        PASSWORD_SALT,
-        100_000
-    ).hex()
+    """Hash a password using bcrypt"""
+    return pwd_context.hash(password)
 
 
-def verify_password(password: str, password_hash: str) -> bool:
-    computed = hash_password(password)
-    return hmac.compare_digest(computed, password_hash)
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify a password against its hash"""
+    return pwd_context.verify(plain_password, hashed_password)
 
 
 def create_access_token(data: dict) -> str:
+    """
+    Create a JWT access token
+    
+    Args:
+        data: Dictionary containing claims (e.g., {"sub": user_id, "role": role})
+        
+    Returns:
+        Encoded JWT token string
+    """
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode["exp"] = expire
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
 
 def create_refresh_token() -> tuple[str, datetime]:
-    expires_at = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-    return str(uuid.uuid4()), expires_at
+    """
+    Create a refresh token
+    
+    Returns:
+        Tuple of (token_string, expiration_datetime)
+    """
+    token = str(uuid.uuid4())
+    expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    return token, expires_at

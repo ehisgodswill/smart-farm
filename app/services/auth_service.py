@@ -11,14 +11,13 @@ from app.models.enums import UserRoleEnum
 from app.schemas.auth import RefreshRequest, RegisterRequest
 from app.utils.db import get_db
 from app.utils.security import (
-    ALGORITHM, 
-    SECRET_KEY, 
     create_refresh_token, 
     hash_password, 
     verify_password, 
     create_access_token
 )
 
+from app.config import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
@@ -117,7 +116,7 @@ def get_current_user(
     db: Session = Depends(get_db),
 ) -> User:
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
 
         sub = payload.get("sub")
         if not isinstance(sub, str):
