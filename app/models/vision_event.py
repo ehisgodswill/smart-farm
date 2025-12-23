@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from sqlalchemy import String, Float, DateTime, ForeignKey
+from sqlalchemy import String, Float, DateTime, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -8,39 +8,17 @@ from app.database import Base
 class VisionEvent(Base):
     __tablename__ = "vision_events"
 
-    id: Mapped[str] = mapped_column(
-        String,
-        primary_key=True
-    )
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    farm_id: Mapped[str] = mapped_column(String, nullable=False)
+    pen_id: Mapped[str] = mapped_column(String, nullable=False)
 
-    pen_id: Mapped[str] = mapped_column(
-        String,
-        ForeignKey("pens.id"),
-        nullable=False
-    )
+    event: Mapped[str] = mapped_column(String, nullable=False)
+    severity: Mapped[str] = mapped_column(String, nullable=False)
+    confidence: Mapped[float] = mapped_column(Float, nullable=False)
 
-    bird_id: Mapped[str | None] = mapped_column(
-        String,
-        ForeignKey("birds.id"),
-        nullable=True
-    )
+    details: Mapped[str] = mapped_column(Text, nullable=True)
 
-    type: Mapped[str] = mapped_column(
-        String,
-        nullable=False  # abnormal_behavior, sick, aggression
-    )
-
-    confidence: Mapped[float | None] = mapped_column(
-        Float,
-        nullable=True
-    )
-
-    image_url: Mapped[str | None] = mapped_column(
-        String,
-        nullable=True
-    )
-
-    timestamp: Mapped[datetime] = mapped_column(
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         nullable=False

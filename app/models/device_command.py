@@ -6,7 +6,7 @@ from sqlalchemy import ForeignKey, String, DateTime, Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
-from app.models.enums import ActionValueEnum
+from app.models.enums import ActionValueEnum,CommandStatusEnum
 
 if TYPE_CHECKING:
     from app.models.device import Device
@@ -43,6 +43,12 @@ class DeviceCommand(Base):
     source: Mapped[str] = mapped_column(
         String,
         nullable=False  # rule | admin | system |manual | safety | ai
+    )
+
+    status: Mapped[CommandStatusEnum] = mapped_column(
+        SQLEnum(CommandStatusEnum, name="command_status_enum"),
+        default=CommandStatusEnum.pending,
+        index=True
     )
 
     issued_at: Mapped[datetime] = mapped_column(

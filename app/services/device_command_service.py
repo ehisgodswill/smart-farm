@@ -34,8 +34,12 @@ def issue_device_command(
 
     db.commit()
     db.refresh(command)
+    
+    try:
+        publish_device_command(command)
+    except Exception as e:
+        # log error, but DO NOT rollback DB
+        print("MQTT publish failed:", e)
 
-    # 3️⃣ Publish to MQTT AFTER commit
-    publish_device_command(command)
 
     return command
